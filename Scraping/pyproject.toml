@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ufa-scraping"
+version = "0.1.0"
+description = "Fetches raw UFA game data (schedule + play-by-play) from the ufastats.com backend API"
+requires-python = ">=3.11"
+dependencies = [
+    "audl",
+    "pandas==2.2.3",
+    "requests",
+    "tqdm",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
