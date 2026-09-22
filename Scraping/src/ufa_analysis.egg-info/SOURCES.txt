@@ -1,0 +1,9 @@
+pyproject.toml
+src/ufa_analysis/__init__.py
+src/ufa_analysis.egg-info/PKG-INFO
+src/ufa_analysis.egg-info/SOURCES.txt
+src/ufa_analysis.egg-info/dependency_links.txt
+src/ufa_analysis.egg-info/requires.txt
+src/ufa_analysis.egg-info/top_level.txt
+src/ufa_analysis/data/__init__.py
+src/ufa_analysis/data/fetch.py

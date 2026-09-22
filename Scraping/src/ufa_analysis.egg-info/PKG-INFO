@@ -1,0 +1,9 @@
+Metadata-Version: 2.4
+Name: ufa-analysis
+Version: 0.1.0
+Summary: UFA advanced-stats pipeline and player performance model
+Requires-Python: >=3.11
+Requires-Dist: audl
+Requires-Dist: pandas==2.2.3
+Requires-Dist: requests
+Requires-Dist: tqdm
