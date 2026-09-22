@@ -11,7 +11,7 @@ excluded).
 |---|---|---|
 | `season` | int | Season year |
 | `game_id` | int | UFA's internal numeric game id |
-| `reg_season` | bool | Regular season vs. playoffs (from the raw `game.reg_season` field) |
+| `reg_season` | bool | **Not reliable for regular-season-vs-playoffs filtering** — the raw `game.reg_season` API field is `True` for every 2026 game checked, including the championship. Kept in the table in case it turns out meaningful in other seasons, but don't trust it for 2026. See "Known limitations" below for how to actually identify playoff games. |
 | `is_home` | bool | Whether the player's team was home |
 | `team_ext_id` | str | Team external id (e.g. `'havoc'`) |
 | `player_game_id` | int | Roster-entry id local to this game (not stable across games) |
@@ -50,9 +50,16 @@ are believed to come from:
   reverse-engineered against real data since the upstream `audl` package's
   own two reference tables contradict each other on several codes — see
   `Cleaning/src/ufa_cleaning/events.py` for the resolution process).
-- One 2026 regular-season game (`game_id` 3818, PIT @ CHI) has no
-  play-by-play at all despite a final score existing, and is skipped
-  entirely — it will have zero rows in `player_game`.
+- One 2026 game (`game_id` 3818, PIT @ CHI) has no play-by-play at all
+  despite a final score existing, and is skipped entirely — it will have
+  zero rows in `player_game`.
+- **Playoffs aren't distinguishable from regular season by any field
+  fetched so far.** `reg_season` is always `True` (see above); the
+  schedule's `week` field is just `week-1`..`week-16` with no explicit
+  playoff marker; only the championship game's `streamingURL` text
+  happens to say "championship" — quarterfinals/semifinals don't. If this
+  split is needed, it'll likely require hardcoding each season's playoff
+  bracket weeks rather than reading it off the API.
 
 `touches` (times a player had the disc) was in the original plan's field
 list but isn't included yet: the API doesn't log a separate event for

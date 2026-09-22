@@ -27,6 +27,10 @@ Cleaning/
   src/ufa_cleaning/      # reusable parsing logic
   scripts/                # CLI entry points
   DATA_DICTIONARY.md    # column-by-column docs for player_game.parquet
+EDA/
+  pyproject.toml        # package "ufa-eda"
+  src/ufa_eda/            # reusable aggregation/clustering logic
+  notebooks/              # exploratory notebooks (no scripts/ — not CLI tools)
 data/
   raw/<season>/          # raw per-game JSON + schedule.json (gitignored)
   processed/              # player_game.parquet etc. (gitignored)
@@ -52,10 +56,21 @@ Python **3.13**, not 3.14 — pandas' prebuilt wheel for 3.14 gets blocked by
 a Windows Application Control policy on this machine, and no source build
 works either (missing MSVC toolchain). Python 3.13 has no such issue.
 
+**`scipy` (and therefore `scikit-learn`) is unusable on this machine** — the
+same Application Control policy blocks scipy's compiled LAPACK/BLAS
+binaries specifically, tried across two scipy versions, even on Python
+3.13 where numpy/pandas/matplotlib/seaborn are fine. Don't add
+`scikit-learn`/`scipy` as a dependency; hand-roll the numpy equivalent
+instead (e.g. `EDA/src/ufa_eda/archetypes.py`'s from-scratch k-means). The
+block has also shown flaky behavior — the same import failed once, then
+succeeded moments later with no code change — so retry once before
+concluding a *new* compiled dependency is blocked, but don't expect scipy
+itself to start working.
+
 ```bash
 python -m venv .venv
 .venv/Scripts/activate          # Windows
-pip install -e ./Scraping -e ./Cleaning
+pip install -e ./Scraping -e ./Cleaning -e ./EDA
 ```
 
 Re-run the relevant `pip install -e ./<Phase>` after adding a new phase
@@ -80,6 +95,13 @@ diffs against the pre-aggregated totals already present in the raw JSON,
 printing a mean-absolute-error summary per stat and writing any mismatches
 to `data/processed/validation_discrepancies.csv`.
 
+Re-execute the Phase 2 EDA notebook in place after changing `player_game.parquet`
+or `ufa_eda`:
+
+```bash
+jupyter nbconvert --to notebook --execute --inplace EDA/notebooks/phase2_eda.ipynb
+```
+
 There is no test suite, linter, or build step yet.
 
 ## Data source and its quirks
@@ -102,6 +124,8 @@ known aggregate fields before trusting a code's assumed meaning.
 
 Known data gaps (see `Cleaning/DATA_DICTIONARY.md` for the full list): no
 stable cross-game player ID (full name used as the key for now), Callahans
-aren't distinguished from an ordinary block + goal, and at least one game
-per season may have no play-by-play at all despite a final score existing
-(handled as a skip, not a crash).
+aren't distinguished from an ordinary block + goal, at least one game per
+season may have no play-by-play at all despite a final score existing
+(handled as a skip, not a crash), and the `reg_season` field is `True` for
+every 2026 game including the championship — it does **not** actually
+distinguish regular season from playoffs despite the name.
