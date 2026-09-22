@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ufa-eda"
+version = "0.1.0"
+description = "Exploratory analysis and player-archetype clustering for the UFA player_game table"
+requires-python = ">=3.11"
+dependencies = [
+    "pandas==2.2.3",
+    "matplotlib",
+    "seaborn",
+    "jupyter",
+]
+# Deliberately no scikit-learn/scipy: scipy's compiled LAPACK/BLAS binaries
+# are blocked by a Windows Application Control policy on at least one dev
+# machine used on this project, across multiple scipy versions (unlike the
+# pandas 3.14-wheel issue, pinning an older scipy version doesn't help).
+# ufa_eda.archetypes implements k-means from scratch with numpy only.
+
+[tool.setuptools.packages.find]
+where = ["src"]
