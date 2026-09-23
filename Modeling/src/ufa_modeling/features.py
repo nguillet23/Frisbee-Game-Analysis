@@ -30,6 +30,15 @@ PER_POINT_RATE_COLS = [
     "receptions_per_point",
 ]
 
+# o_line_share and team_pace are only known *during*/*after* the current
+# game (this game's own O-line split, this game's own total points), so a
+# predictive model can't use their raw current-game values without leaking
+# the outcome. Rolled into add_rolling_form alongside the rate stats so
+# Phase 5 has a "this player's/team's typical O-line share/pace coming in"
+# version available instead — see FORM_COLS.
+CONTEXT_ROLLING_COLS = ["o_line_share", "team_pace"]
+FORM_COLS = PER_POINT_RATE_COLS + CONTEXT_ROLLING_COLS
+
 ROLLING_WINDOW_GAMES = 3
 
 
@@ -127,7 +136,7 @@ def _prior_only(group: pd.DataFrame, cols: list[str], window: int) -> pd.DataFra
 
 
 def add_rolling_form(
-    df: pd.DataFrame, rate_cols: list[str] = PER_POINT_RATE_COLS, window: int = ROLLING_WINDOW_GAMES
+    df: pd.DataFrame, rate_cols: list[str] = FORM_COLS, window: int = ROLLING_WINDOW_GAMES
 ) -> pd.DataFrame:
     """Add trailing-``window``-game and season-to-date average rate
     features per player, computed from games strictly before the current

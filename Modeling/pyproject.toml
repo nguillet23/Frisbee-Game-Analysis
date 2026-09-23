@@ -13,11 +13,19 @@ dependencies = [
     "matplotlib",
     "seaborn",
     "jupyter",
+    "xgboost",
+    "torch",
 ]
 # Deliberately no scikit-learn/scipy/statsmodels: scipy's compiled
 # LAPACK/BLAS binaries are blocked by a Windows Application Control policy
 # on at least one dev machine used on this project (see CLAUDE.md).
-# ufa_modeling.target implements OLS from scratch with numpy's lstsq.
+# ufa_modeling.target/model implement OLS from scratch with numpy's lstsq.
+#
+# Also no `shap`: it depends on scipy internals (`scipy._lib._uarray`) and
+# hits the same Application Control block. xgboost and torch, checked on
+# the same machine, are NOT blocked (compiled but apparently not flagged),
+# so Phase 5 uses XGBoost's own built-in Tree SHAP (`pred_contribs=True`)
+# for per-prediction explanations instead of the `shap` package.
 
 [tool.setuptools.packages.find]
 where = ["src"]
