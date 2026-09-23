@@ -18,11 +18,15 @@ regression against team scoring outcomes, Phase 4 built the player-game
 feature table (rates, archetype, rolling form, opponent strength), and
 Phase 5 has trained and compared a baseline regression, an XGBoost model
 (with built-in Tree SHAP explainability), and a PyTorch comparison model
-that predict a player's rating for a game *before it happens*. Output/
-presentation (Phase 6) hasn't started yet. See `Plans/UFA_Analysis.md` for
-the full plan and findings per phase — note Phase 5's R² ≈ 0.35 and lack of
-confirmed All-Star ground truth mean the model is a directional signal, not
-an authoritative grade, at this stage.
+that predict a player's rating for a game *before it happens*, and Phase 6
+has built a React/Vite leaderboard/profile/comparison site reading a static
+JSON export, with a GitHub Actions workflow to deploy it to GitHub Pages.
+**The site has been built and tested locally only — it has not been
+pushed, and GitHub Pages has not been enabled** (see "Publishing the site"
+below for why). See `Plans/UFA_Analysis.md` for the full plan and findings
+per phase — note Phase 5's R² ≈ 0.35 and lack of confirmed All-Star ground
+truth mean the model is a directional signal, not an authoritative grade,
+at this stage.
 
 ## Data source
 
@@ -63,7 +67,11 @@ Modeling/
 data/
   raw/<season>/            raw per-game JSON + schedule.json (gitignored)
   processed/                player_game.parquet, game_score.parquet, player_ratings.parquet, etc. (gitignored)
+Site/                     React (Vite) app — leaderboard, player profile, comparison tool
+  public/data/              leaderboard.json + players/*.json (written by export_site_data.py)
+  src/                      pages/, components/, api.js (fetches the static JSON)
 Plans/                    planning docs (gitignored, local only)
+.github/workflows/        deploy-site.yml — builds Site/ on every branch push (smoke test), deploys to GitHub Pages only from main
 ```
 
 Scripts only contain a `main()`; all reusable logic lives in each phase's
@@ -112,8 +120,45 @@ jupyter nbconvert --to notebook --execute --inplace Modeling/notebooks/phase4_fe
 jupyter nbconvert --to notebook --execute --inplace Modeling/notebooks/phase5_modeling.ipynb
 ```
 
-## Why not just republish raw stats?
+## The site (Phase 6)
+
+Export the static JSON the site reads (writes `Site/public/data/`):
+
+```bash
+python Modeling/scripts/export_site_data.py
+```
+
+Run it locally:
+
+```bash
+cd Site
+npm install
+npm run dev
+```
+
+Or build the static output that GitHub Pages would serve:
+
+```bash
+cd Site
+npm run build      # writes Site/dist
+npm run preview    # serve that build locally to sanity-check it
+```
+
+`.github/workflows/deploy-site.yml` builds `Site/` on **every branch push**
+that touches it — a build-only smoke test, so a broken site is caught on a
+feature branch, not just when it lands on `main`. It only produces a Pages
+artifact and deploys via `actions/deploy-pages` when the push is to `main`.
+It builds from whatever `Site/public/data/*.json` is already committed; it
+does not rerun the Python pipeline. It needs GitHub Pages enabled (Settings
+→ Pages → source "GitHub Actions") before it can deploy anything.
+
+## Publishing the site
 
 The repo is public, but UFA's stats terms of use for redistributing raw
-data haven't been confirmed yet — see open questions before any public
-data export ships.
+*or derived* data haven't been confirmed yet — see open questions in
+`Plans/UFA_Analysis.md`. This is why, even though the site and export
+script both work, `Site/public/data/*.json` hasn't been committed, nothing
+has been pushed, and GitHub Pages hasn't been enabled: doing so would
+actually publish UFA-derived player stats, which is exactly the unresolved
+question, not a hypothetical one. Resolve that first, or consciously accept
+the risk, before running the steps above and pushing.

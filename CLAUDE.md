@@ -31,6 +31,14 @@ EDA/
   pyproject.toml        # package "ufa-eda"
   src/ufa_eda/            # reusable aggregation/clustering logic
   notebooks/              # exploratory notebooks (no scripts/ — not CLI tools)
+Modeling/
+  pyproject.toml        # package "ufa-modeling"
+  src/ufa_modeling/       # target definition, features, models, site data export
+  scripts/                # CLI entry points, incl. export_site_data.py
+  notebooks/              # phase3/4/5 notebooks
+Site/                   # React (Vite) app — not a Python package
+  public/data/            # leaderboard.json + players/*.json (written by export_site_data.py)
+  src/                    # pages/, components/, api.js
 data/
   raw/<season>/          # raw per-game JSON + schedule.json (gitignored)
   processed/              # player_game.parquet etc. (gitignored)
@@ -49,6 +57,11 @@ notebooks) instead of locked inside a CLI entry point.
 
 `data/` is gitignored entirely — UFA's stats terms of use for redistributing
 raw data haven't been confirmed, so raw and processed data stay local only.
+`Site/public/data/*.json` (the Phase 6 derived-data export) is **not**
+gitignored, but hasn't been committed either — the same open ToS question
+applies to it, so don't `git add`/commit/push it, or push `Site/` changes
+that would trigger `.github/workflows/deploy-site.yml`, without checking
+with the user first.
 
 ## Environment
 
@@ -116,7 +129,18 @@ jupyter nbconvert --to notebook --execute --inplace Modeling/notebooks/phase4_fe
 jupyter nbconvert --to notebook --execute --inplace Modeling/notebooks/phase5_modeling.ipynb
 ```
 
-There is no test suite, linter, or build step yet.
+Export the static JSON the `Site/` React app reads, then run/build it:
+
+```bash
+python Modeling/scripts/export_site_data.py    # writes Site/public/data/
+cd Site && npm install && npm run dev          # or: npm run build && npm run preview
+```
+
+See "Publishing the site" in `README.md` before committing `Site/public/data/`
+or pushing `Site/` changes — the UFA ToS open question applies to the
+derived per-player export too, not just raw data.
+
+There is no test suite or linter yet; `Site/`'s build step (`npm run build`) is the only build step in the repo.
 
 ## Data source and its quirks
 
