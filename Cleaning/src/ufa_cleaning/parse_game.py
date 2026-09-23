@@ -144,6 +144,8 @@ def parse_game_score(game_json: dict) -> list[dict]:
     if home_score is None or away_score is None:
         return []
 
+    start_timestamp = game.get("start_timestamp")
+
     rows = []
     for is_home, team_key, team_score, opponent_score in [
         (True, "team_season_home", home_score, away_score),
@@ -158,6 +160,7 @@ def parse_game_score(game_json: dict) -> list[dict]:
                 "team_score": team_score,
                 "opponent_score": opponent_score,
                 "point_differential": team_score - opponent_score,
+                "start_timestamp": start_timestamp,
             }
         )
     return rows
