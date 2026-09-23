@@ -70,7 +70,7 @@ itself to start working.
 ```bash
 python -m venv .venv
 .venv/Scripts/activate          # Windows
-pip install -e ./Scraping -e ./Cleaning -e ./EDA
+pip install -e ./Scraping -e ./Cleaning -e ./EDA -e ./Modeling
 ```
 
 Re-run the relevant `pip install -e ./<Phase>` after adding a new phase
@@ -93,13 +93,17 @@ python Cleaning/scripts/build_player_game_table.py --seasons 2026
 This also validates itself: it rolls player rows back up to team level and
 diffs against the pre-aggregated totals already present in the raw JSON,
 printing a mean-absolute-error summary per stat and writing any mismatches
-to `data/processed/validation_discrepancies.csv`.
+to `data/processed/validation_discrepancies.csv`. It also writes
+`data/processed/game_score.parquet` (one row per team per game with its
+final score, taken straight off the raw JSON rather than summed from
+events — see `Cleaning/DATA_DICTIONARY.md`).
 
-Re-execute the Phase 2 EDA notebook in place after changing `player_game.parquet`
-or `ufa_eda`:
+Re-execute the Phase 2 EDA or Phase 3 target-definition notebooks in place
+after changing `player_game.parquet`, `ufa_eda`, or `ufa_modeling`:
 
 ```bash
 jupyter nbconvert --to notebook --execute --inplace EDA/notebooks/phase2_eda.ipynb
+jupyter nbconvert --to notebook --execute --inplace Modeling/notebooks/phase3_target_definition.ipynb
 ```
 
 There is no test suite, linter, or build step yet.
