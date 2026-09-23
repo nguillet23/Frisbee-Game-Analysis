@@ -37,6 +37,29 @@ excluded).
 | `hockey_assists` | Secondary assists (the pass before the assist) |
 | `completion_pct` | `completions / throw_attempts` |
 
+## `game_score` table
+
+Built alongside `player_game` by the same script, written to
+`data/processed/game_score.parquet`. One row per team per game (2 rows per
+`game_id`), taken directly from `game_json["game"]["score_home"/"score_away"]`
+rather than summed from parsed events — so, unlike `player_game`, it has a
+row for the one 2026 game with no play-by-play at all (144 games × 2 = 288
+rows, vs. `player_game`'s 143 games).
+
+| Column | Type | Description |
+|---|---|---|
+| `season` | int | Season year |
+| `game_id` | int | UFA's internal numeric game id (joins to `player_game`) |
+| `team_ext_id` | str | Team external id |
+| `is_home` | bool | Whether this team was home |
+| `team_score` | int | This team's final score |
+| `opponent_score` | int | The opponent's final score |
+| `point_differential` | int | `team_score - opponent_score` |
+
+Used by `Modeling/src/ufa_modeling/target.py` (Phase 3) as the authoritative
+scoring outcome to regress against — summed `goals` from `player_game`
+carry the same ~1% parsing noise as `completions`/`turnovers` below.
+
 ## Known limitations (as of the 2026-season build)
 
 Validated by rolling player rows back up to the team level and comparing

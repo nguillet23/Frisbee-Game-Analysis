@@ -130,6 +130,39 @@ def _parse_team_events(raw_events_json: str) -> dict:
     return stats
 
 
+def parse_game_score(game_json: dict) -> list[dict]:
+    """Extract each team's final score for a game.
+
+    Unlike ``parse_game``, this doesn't depend on play-by-play events being
+    present — the final score ships separately in ``game_json["game"]``, so
+    this still returns rows for the one 2026 game with no play-by-play at
+    all (see Cleaning/DATA_DICTIONARY.md).
+    """
+    game = game_json["game"]
+    home_score = game.get("score_home")
+    away_score = game.get("score_away")
+    if home_score is None or away_score is None:
+        return []
+
+    rows = []
+    for is_home, team_key, team_score, opponent_score in [
+        (True, "team_season_home", home_score, away_score),
+        (False, "team_season_away", away_score, home_score),
+    ]:
+        team_ext_id = game[team_key]["team"]["ext_team_id"]
+        rows.append(
+            {
+                "game_id": game["id"],
+                "team_ext_id": team_ext_id,
+                "is_home": is_home,
+                "team_score": team_score,
+                "opponent_score": opponent_score,
+                "point_differential": team_score - opponent_score,
+            }
+        )
+    return rows
+
+
 def parse_game(game_json: dict) -> pd.DataFrame:
     """Parse a single game's raw JSON into a player-game DataFrame.
 
