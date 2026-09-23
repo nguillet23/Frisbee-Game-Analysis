@@ -18,7 +18,12 @@ leaking information from it.
 import numpy as np
 import pandas as pd
 
-from ufa_eda.archetypes import aggregate_player_season, cluster_archetypes, compute_rate_features
+from ufa_eda.archetypes import (
+    aggregate_player_season,
+    cluster_archetypes,
+    compute_rate_features,
+    label_archetypes,
+)
 
 PER_POINT_RATE_COLS = [
     "completion_pct",
@@ -90,21 +95,6 @@ def add_team_context(df: pd.DataFrame, game_score: pd.DataFrame) -> pd.DataFrame
     return df.merge(pace, on=["season", "game_id", "team_ext_id"], how="left")
 
 
-def _label_archetype(center: pd.Series, all_centers: pd.DataFrame) -> str:
-    """Heuristic human-readable label for a k-means cluster center, based on
-    which discovered feature stands out most relative to the other
-    clusters — see EDA/notebooks/phase2_eda.ipynb for the eyeballed version
-    this codifies. Not a rigorous taxonomy, just a readability aid.
-    """
-    if center["blocks_per_point"] == all_centers["blocks_per_point"].max():
-        return "D-line specialist"
-    if center["throws_per_point"] == all_centers["throws_per_point"].max():
-        return "Handler"
-    if center["goals_per_point"] == all_centers["goals_per_point"].max():
-        return "Cutter"
-    return "Hybrid"
-
-
 def add_archetype(player_game: pd.DataFrame, min_points_played: int = 50) -> pd.DataFrame:
     """Attach a per-player-season archetype (Phase 2 clustering) to every
     game row for that player-season. Players below ``min_points_played``
@@ -114,7 +104,7 @@ def add_archetype(player_game: pd.DataFrame, min_points_played: int = 50) -> pd.
     season = aggregate_player_season(player_game)
     rates = compute_rate_features(season, min_points_played=min_points_played)
     clustered, centers = cluster_archetypes(rates, random_state=0)
-    centers["archetype_label"] = [_label_archetype(centers.loc[i], centers) for i in centers.index]
+    centers = label_archetypes(centers)
 
     archetype_lookup = clustered[["player_name", "season", "archetype_cluster"]].merge(
         centers[["archetype_label"]], left_on="archetype_cluster", right_index=True

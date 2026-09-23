@@ -76,6 +76,27 @@ def compute_rate_features(player_season: pd.DataFrame, min_points_played: int = 
     return df
 
 
+def label_archetypes(centers: pd.DataFrame) -> pd.DataFrame:
+    """Heuristic human-readable label per cluster center, based on which
+    discovered feature stands out most relative to the other clusters —
+    codifies the eyeballed reading from EDA/notebooks/phase2_eda.ipynb. Not
+    a rigorous taxonomy, just a readability aid. Returns ``centers`` with
+    an added ``archetype_label`` column.
+    """
+    def _label(center):
+        if center["blocks_per_point"] == centers["blocks_per_point"].max():
+            return "D-line specialist"
+        if center["throws_per_point"] == centers["throws_per_point"].max():
+            return "Handler"
+        if center["goals_per_point"] == centers["goals_per_point"].max():
+            return "Cutter"
+        return "Hybrid"
+
+    result = centers.copy()
+    result["archetype_label"] = [_label(centers.loc[i]) for i in centers.index]
+    return result
+
+
 def _kmeans_plusplus_init(x: np.ndarray, n_clusters: int, rng: np.random.Generator) -> np.ndarray:
     """k-means++ seeding: pick centers spread out relative to each other."""
     n_samples = x.shape[0]
