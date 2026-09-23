@@ -55,6 +55,7 @@ rows, vs. `player_game`'s 143 games).
 | `team_score` | int | This team's final score |
 | `opponent_score` | int | The opponent's final score |
 | `point_differential` | int | `team_score - opponent_score` |
+| `start_timestamp` | str (ISO 8601, UTC) | Game start time — used by `Modeling/src/ufa_modeling/features.py` (Phase 4) to order each player's/team's games chronologically for rolling-form and opponent-strength features, avoiding leakage from future games. |
 
 Used by `Modeling/src/ufa_modeling/target.py` (Phase 3) as the authoritative
 scoring outcome to regress against — summed `goals` from `player_game`

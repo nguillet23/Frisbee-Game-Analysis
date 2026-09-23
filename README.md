@@ -12,11 +12,12 @@ a public leaderboard/profile site built on top of it.
 
 Raw play-by-play data for the full 2026 UFA season (144 games, regular
 season + playoffs) has been fetched and parsed into a clean player-game
-table, explored in Phase 2 EDA (player archetypes via clustering), and
-Phase 3 has defined a composite player-efficiency target with weights
-learned by regression against team scoring outcomes. Feature engineering
-and modeling (Phases 4-5) haven't started yet. See `Plans/UFA_Analysis.md`
-for the full plan and findings per phase.
+table, explored in Phase 2 EDA (player archetypes via clustering), Phase 3
+has defined a composite player-efficiency target with weights learned by
+regression against team scoring outcomes, and Phase 4 has built the
+player-game feature table (rates, archetype, rolling form, opponent
+strength) Phase 5 will model against. Modeling (Phase 5) hasn't started
+yet. See `Plans/UFA_Analysis.md` for the full plan and findings per phase.
 
 ## Data source
 
@@ -95,12 +96,13 @@ This also writes `data/processed/game_score.parquet` (each team's final
 score per game) and validates itself against the raw JSON's own reported
 team totals.
 
-Re-execute the Phase 2 EDA or Phase 3 target-definition notebooks in place
-after changing the upstream data or the relevant package:
+Re-execute the Phase 2, 3, or 4 notebooks in place after changing the
+upstream data or the relevant package:
 
 ```bash
 jupyter nbconvert --to notebook --execute --inplace EDA/notebooks/phase2_eda.ipynb
 jupyter nbconvert --to notebook --execute --inplace Modeling/notebooks/phase3_target_definition.ipynb
+jupyter nbconvert --to notebook --execute --inplace Modeling/notebooks/phase4_features.ipynb
 ```
 
 ## Why not just republish raw stats?

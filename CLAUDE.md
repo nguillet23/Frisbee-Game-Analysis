@@ -98,12 +98,13 @@ to `data/processed/validation_discrepancies.csv`. It also writes
 final score, taken straight off the raw JSON rather than summed from
 events — see `Cleaning/DATA_DICTIONARY.md`).
 
-Re-execute the Phase 2 EDA or Phase 3 target-definition notebooks in place
-after changing `player_game.parquet`, `ufa_eda`, or `ufa_modeling`:
+Re-execute the Phase 2, 3, or 4 notebooks in place after changing
+`player_game.parquet`, `ufa_eda`, or `ufa_modeling`:
 
 ```bash
 jupyter nbconvert --to notebook --execute --inplace EDA/notebooks/phase2_eda.ipynb
 jupyter nbconvert --to notebook --execute --inplace Modeling/notebooks/phase3_target_definition.ipynb
+jupyter nbconvert --to notebook --execute --inplace Modeling/notebooks/phase4_features.ipynb
 ```
 
 There is no test suite, linter, or build step yet.
