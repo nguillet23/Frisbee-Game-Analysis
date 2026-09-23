@@ -14,10 +14,15 @@ Raw play-by-play data for the full 2026 UFA season (144 games, regular
 season + playoffs) has been fetched and parsed into a clean player-game
 table, explored in Phase 2 EDA (player archetypes via clustering), Phase 3
 has defined a composite player-efficiency target with weights learned by
-regression against team scoring outcomes, and Phase 4 has built the
-player-game feature table (rates, archetype, rolling form, opponent
-strength) Phase 5 will model against. Modeling (Phase 5) hasn't started
-yet. See `Plans/UFA_Analysis.md` for the full plan and findings per phase.
+regression against team scoring outcomes, Phase 4 built the player-game
+feature table (rates, archetype, rolling form, opponent strength), and
+Phase 5 has trained and compared a baseline regression, an XGBoost model
+(with built-in Tree SHAP explainability), and a PyTorch comparison model
+that predict a player's rating for a game *before it happens*. Output/
+presentation (Phase 6) hasn't started yet. See `Plans/UFA_Analysis.md` for
+the full plan and findings per phase — note Phase 5's R² ≈ 0.35 and lack of
+confirmed All-Star ground truth mean the model is a directional signal, not
+an authoritative grade, at this stage.
 
 ## Data source
 
@@ -53,11 +58,11 @@ EDA/
   notebooks/               phase2_eda.ipynb
 Modeling/
   pyproject.toml        package "ufa-modeling"
-  src/ufa_modeling/        target definition (composite rating regression), later: models
-  notebooks/               phase3_target_definition.ipynb
+  src/ufa_modeling/        target definition, feature engineering, models (OLS/XGBoost/PyTorch)
+  notebooks/               phase3_target_definition.ipynb, phase4_features.ipynb, phase5_modeling.ipynb
 data/
   raw/<season>/            raw per-game JSON + schedule.json (gitignored)
-  processed/                player_game.parquet, game_score.parquet, etc. (gitignored)
+  processed/                player_game.parquet, game_score.parquet, player_ratings.parquet, etc. (gitignored)
 Plans/                    planning docs (gitignored, local only)
 ```
 
@@ -96,13 +101,15 @@ This also writes `data/processed/game_score.parquet` (each team's final
 score per game) and validates itself against the raw JSON's own reported
 team totals.
 
-Re-execute the Phase 2, 3, or 4 notebooks in place after changing the
-upstream data or the relevant package:
+Re-execute the Phase 2-5 notebooks in place after changing the upstream
+data or the relevant package (Phase 5 also rewrites
+`data/processed/player_ratings.parquet`):
 
 ```bash
 jupyter nbconvert --to notebook --execute --inplace EDA/notebooks/phase2_eda.ipynb
 jupyter nbconvert --to notebook --execute --inplace Modeling/notebooks/phase3_target_definition.ipynb
 jupyter nbconvert --to notebook --execute --inplace Modeling/notebooks/phase4_features.ipynb
+jupyter nbconvert --to notebook --execute --inplace Modeling/notebooks/phase5_modeling.ipynb
 ```
 
 ## Why not just republish raw stats?

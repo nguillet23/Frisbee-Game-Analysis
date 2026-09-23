@@ -61,11 +61,18 @@ same Application Control policy blocks scipy's compiled LAPACK/BLAS
 binaries specifically, tried across two scipy versions, even on Python
 3.13 where numpy/pandas/matplotlib/seaborn are fine. Don't add
 `scikit-learn`/`scipy` as a dependency; hand-roll the numpy equivalent
-instead (e.g. `EDA/src/ufa_eda/archetypes.py`'s from-scratch k-means). The
+instead (e.g. `EDA/src/ufa_eda/archetypes.py`'s from-scratch k-means,
+`Modeling/src/ufa_modeling/{target,model}.py`'s from-scratch OLS). The
 block has also shown flaky behavior — the same import failed once, then
 succeeded moments later with no code change — so retry once before
 concluding a *new* compiled dependency is blocked, but don't expect scipy
 itself to start working.
+
+**`xgboost` and `torch` DO work on this machine** (checked in Phase 5) —
+the block doesn't extend to them. **`shap` does not** — it imports
+`scipy._lib._uarray` internally and hits the same failure as scipy itself.
+Use XGBoost's own built-in Tree SHAP (`booster.predict(x, pred_contribs=True)`)
+for explainability instead of the `shap` package.
 
 ```bash
 python -m venv .venv
@@ -98,13 +105,15 @@ to `data/processed/validation_discrepancies.csv`. It also writes
 final score, taken straight off the raw JSON rather than summed from
 events — see `Cleaning/DATA_DICTIONARY.md`).
 
-Re-execute the Phase 2, 3, or 4 notebooks in place after changing
-`player_game.parquet`, `ufa_eda`, or `ufa_modeling`:
+Re-execute the Phase 2-5 notebooks in place after changing
+`player_game.parquet`, `ufa_eda`, or `ufa_modeling` (Phase 5 also rewrites
+`data/processed/player_ratings.parquet`):
 
 ```bash
 jupyter nbconvert --to notebook --execute --inplace EDA/notebooks/phase2_eda.ipynb
 jupyter nbconvert --to notebook --execute --inplace Modeling/notebooks/phase3_target_definition.ipynb
 jupyter nbconvert --to notebook --execute --inplace Modeling/notebooks/phase4_features.ipynb
+jupyter nbconvert --to notebook --execute --inplace Modeling/notebooks/phase5_modeling.ipynb
 ```
 
 There is no test suite, linter, or build step yet.
