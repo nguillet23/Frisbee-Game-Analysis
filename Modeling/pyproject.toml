@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ufa-modeling"
+version = "0.1.0"
+description = "Target definition and player-performance modeling for the UFA player_game table"
+requires-python = ">=3.11"
+dependencies = [
+    "pandas==2.2.3",
+    "numpy",
+    "matplotlib",
+    "seaborn",
+    "jupyter",
+]
+# Deliberately no scikit-learn/scipy/statsmodels: scipy's compiled
+# LAPACK/BLAS binaries are blocked by a Windows Application Control policy
+# on at least one dev machine used on this project (see CLAUDE.md).
+# ufa_modeling.target implements OLS from scratch with numpy's lstsq.
+
+[tool.setuptools.packages.find]
+where = ["src"]
