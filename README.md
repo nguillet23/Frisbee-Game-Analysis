@@ -21,9 +21,9 @@ Phase 5 has trained and compared a baseline regression, an XGBoost model
 that predict a player's rating for a game *before it happens*, and Phase 6
 has built a React/Vite leaderboard/profile/comparison site reading a static
 JSON export, with a GitHub Actions workflow to deploy it to GitHub Pages.
-**The site has been built and tested locally only — it has not been
-pushed, and GitHub Pages has not been enabled** (see "Publishing the site"
-below for why). See `Plans/UFA_Analysis.md` for the full plan and findings
+**The site has been built and tested locally only — its data export is
+gitignored and deploys are manual-only, so it is not published** (see
+"Publishing the site" below for why). See `Plans/UFA_Analysis.md` for the full plan and findings
 per phase — note Phase 5's R² ≈ 0.35 and lack of confirmed All-Star ground
 truth mean the model is a directional signal, not an authoritative grade,
 at this stage.
@@ -146,19 +146,23 @@ npm run preview    # serve that build locally to sanity-check it
 
 `.github/workflows/deploy-site.yml` builds `Site/` on **every branch push**
 that touches it — a build-only smoke test, so a broken site is caught on a
-feature branch, not just when it lands on `main`. It only produces a Pages
-artifact and deploys via `actions/deploy-pages` when the push is to `main`.
-It builds from whatever `Site/public/data/*.json` is already committed; it
-does not rerun the Python pipeline. It needs GitHub Pages enabled (Settings
-→ Pages → source "GitHub Actions") before it can deploy anything.
+feature branch, not just when it lands on `main`. Pushes never deploy: it
+only produces a Pages artifact and deploys via `actions/deploy-pages` when
+run **manually** on `main` (Actions → "Deploy site to GitHub Pages" → Run
+workflow). It builds from whatever `Site/public/data/*.json` is committed;
+it does not rerun the Python pipeline. It needs GitHub Pages enabled
+(Settings → Pages → source "GitHub Actions") before it can deploy anything.
 
 ## Publishing the site
 
 The repo is public, but UFA's stats terms of use for redistributing raw
 *or derived* data haven't been confirmed yet — see open questions in
-`Plans/UFA_Analysis.md`. This is why, even though the site and export
-script both work, `Site/public/data/*.json` hasn't been committed, nothing
-has been pushed, and GitHub Pages hasn't been enabled: doing so would
-actually publish UFA-derived player stats, which is exactly the unresolved
-question, not a hypothetical one. Resolve that first, or consciously accept
-the risk, before running the steps above and pushing.
+`Plans/UFA_Analysis.md`. So `Site/public/data/` is **gitignored** (the
+export stays local) and the deploy workflow is **manual-only**: merging
+code to `main` can't publish UFA-derived player stats by accident. Once the
+ToS question is resolved (or the risk is consciously accepted):
+
+1. Remove `/Site/public/data/` from `.gitignore`, then regenerate and commit
+   the export (`python Modeling/scripts/export_site_data.py`).
+2. Enable GitHub Pages (Settings → Pages → source "GitHub Actions").
+3. Run the deploy workflow manually on `main`.

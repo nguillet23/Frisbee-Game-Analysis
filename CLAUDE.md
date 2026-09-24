@@ -57,11 +57,12 @@ notebooks) instead of locked inside a CLI entry point.
 
 `data/` is gitignored entirely — UFA's stats terms of use for redistributing
 raw data haven't been confirmed, so raw and processed data stay local only.
-`Site/public/data/*.json` (the Phase 6 derived-data export) is **not**
-gitignored, but hasn't been committed either — the same open ToS question
-applies to it, so don't `git add`/commit/push it, or push `Site/` changes
-that would trigger `.github/workflows/deploy-site.yml`, without checking
-with the user first.
+`Site/public/data/` (the Phase 6 derived-data export) is gitignored too, for
+the same open ToS question — don't force-add it or un-ignore it without
+checking with the user first. `.github/workflows/deploy-site.yml` only
+deploys on a manual `workflow_dispatch` run on `main` (pushes are
+build-only), so don't loosen that trigger or trigger a deploy without the
+user either.
 
 ## Environment
 
