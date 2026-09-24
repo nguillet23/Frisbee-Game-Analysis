@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ufa-cleaning"
+version = "0.1.0"
+description = "Parses raw UFA game JSON (box score + play-by-play) into a clean player_game table"
+requires-python = ">=3.11"
+dependencies = [
+    "pandas==2.2.3",
+    "pyarrow",
+    "tqdm",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]

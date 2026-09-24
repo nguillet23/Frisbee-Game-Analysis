@@ -4,8 +4,8 @@ Idempotent: skips games already downloaded, so it's safe to re-run to pick
 up new games or retry failures.
 
 Usage:
-    python scripts/fetch_games.py --seasons 2026
-    python scripts/fetch_games.py --seasons 2012 2013 2014
+    python Scraping/scripts/fetch_games.py --seasons 2026
+    python Scraping/scripts/fetch_games.py --seasons 2012 2013 2014
 """
 
 import argparse
@@ -13,7 +13,7 @@ import argparse
 import requests
 from tqdm import tqdm
 
-from ufa_analysis.data.fetch import RAW_DIR, fetch_game, fetch_season_schedule
+from ufa_scraping.fetch import RAW_DIR, fetch_game, fetch_season_schedule
 
 
 def main():

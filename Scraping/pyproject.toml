@@ -3,9 +3,9 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "ufa-analysis"
+name = "ufa-scraping"
 version = "0.1.0"
-description = "UFA advanced-stats pipeline and player performance model"
+description = "Fetches raw UFA game data (schedule + play-by-play) from the ufastats.com backend API"
 requires-python = ">=3.11"
 dependencies = [
     "audl",
