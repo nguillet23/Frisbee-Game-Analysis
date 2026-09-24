@@ -2,7 +2,10 @@ name: Deploy site to GitHub Pages
 
 # Builds Site/ (the React/Vite app from Plans/UFA_Analysis.md Phase 6) on
 # every branch push that touches it, as a build-only smoke test — but only
-# actually deploys to GitHub Pages from `main`.
+# deploys to GitHub Pages when run manually (Actions -> "Run workflow") on
+# `main`. Deploy is manual-only while UFA's stats ToS is unconfirmed and
+# Site/public/data/ is gitignored, so a merge can't publish anything (or
+# publish a data-less site) by accident.
 #
 # This does NOT re-run the Python pipeline (fetch/clean/model/export) — it
 # builds from whatever Site/public/data/*.json is already committed. The
@@ -52,18 +55,18 @@ jobs:
         working-directory: Site
         run: npm run build
 
-      # Only main goes on to produce a Pages artifact.
-      - if: github.ref == 'refs/heads/main'
+      # Only a manual run on main goes on to produce a Pages artifact.
+      - if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
         uses: actions/configure-pages@v5
 
-      - if: github.ref == 'refs/heads/main'
+      - if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
         uses: actions/upload-pages-artifact@v3
         with:
           path: Site/dist
 
   deploy:
     needs: build
-    if: github.ref == 'refs/heads/main'
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment:
       name: github-pages

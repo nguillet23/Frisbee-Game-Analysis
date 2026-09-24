@@ -4,3 +4,6 @@ __pycache__/
 *.pyc
 *.egg-info/
 /data/
+# Derived per-player export — kept local until UFA's stats ToS is confirmed
+# (see "Publishing the site" in README.md).
+/Site/public/data/
